@@ -1,0 +1,166 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum PlanType {
+  FREE
+  PREMIUM
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  EXPIRED
+}
+
+enum ProviderHealth {
+  HEALTHY
+  DEGRADED
+  UNHEALTHY
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}
+
+model User {
+  id                     String         @id @default(uuid())
+  email                  String         @unique
+  passwordHash           String
+  firstName              String?
+  lastName               String?
+  role                   Role           @default(USER)
+  isEmailVerified        Boolean        @default(false)
+  emailVerificationToken String?
+  createdAt              DateTime       @default(now())
+  updatedAt              DateTime       @updatedAt
+
+  sessions               Session[]
+  subscription           Subscription?
+  conversations          Conversation[]
+  webSearches            WebSearch[]
+  apiLogs                ApiUsageLog[]
+
+  @@map("users")
+}
+
+model Session {
+  id               String   @id @default(uuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refreshTokenHash String
+  userAgent        String?
+  ipAddress        String?
+  isRevoked        Boolean  @default(false)
+  expiresAt        DateTime
+  createdAt        DateTime @default(now())
+
+  @@map("sessions")
+}
+
+model Subscription {
+  id            String             @id @default(uuid())
+  userId        String             @unique
+  user          User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan          PlanType           @default(FREE)
+  status        SubscriptionStatus @default(ACTIVE)
+  monthlyLimit  Int                @default(50)
+  usedRequests  Int                @default(0)
+  periodStart   DateTime           @default(now())
+  periodEnd     DateTime
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+
+  @@map("subscriptions")
+}
+
+model AIProvider {
+  id              String         @id @default(uuid())
+  name            String         @unique
+  displayName     String
+  apiKey          String?
+  baseUrl         String?
+  models          String         @default("[]")
+  isEnabled       Boolean        @default(true)
+  isDefault       Boolean        @default(false)
+  healthStatus    ProviderHealth @default(HEALTHY)
+  lastHealthCheck DateTime?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  conversations   Conversation[]
+  apiLogs         ApiUsageLog[]
+
+  @@map("ai_providers")
+}
+
+model Conversation {
+  id         String      @id @default(uuid())
+  userId     String
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title      String
+  providerId String?
+  provider   AIProvider? @relation(fields: [providerId], references: [id], onDelete: SetNull)
+  model      String?
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  messages   Message[]
+
+  @@map("conversations")
+}
+
+model Message {
+  id             String       @id @default(uuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  role           MessageRole
+  content        String
+  tokensUsed     Int          @default(0)
+  createdAt      DateTime     @default(now())
+
+  @@map("messages")
+}
+
+model WebSearch {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  query     String
+  queryHash String
+  results   String
+  hitCount  Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("web_searches")
+}
+
+model ApiUsageLog {
+  id         String      @id @default(uuid())
+  userId     String?
+  user       User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  endpoint   String
+  providerId String?
+  provider   AIProvider? @relation(fields: [providerId], references: [id], onDelete: SetNull)
+  model      String?
+  tokensUsed Int         @default(0)
+  statusCode Int         @default(200)
+  durationMs Int         @default(0)
+  ipAddress  String?
+  createdAt  DateTime    @default(now())
+
+  @@map("api_usage_logs")
+}
