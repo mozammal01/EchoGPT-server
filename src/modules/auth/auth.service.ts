@@ -144,7 +144,12 @@ export class AuthService {
       }
 
       const tokens = await this.generateTokens(user.id, user.email, user.role);
-      await this.saveRefreshToken(user.id, tokens.refreshToken, validSession.userAgent, validSession.ipAddress);
+      await this.saveRefreshToken(
+        user.id,
+        tokens.refreshToken,
+        validSession.userAgent || undefined,
+        validSession.ipAddress || undefined,
+      );
 
       return {
         message: 'Tokens refreshed successfully',
@@ -206,12 +211,12 @@ export class AuthService {
 
     const accessToken = this.jwtService.sign(payload, {
       secret: process.env.JWT_SECRET || 'echogpt_super_secret_jwt_access_key_2026',
-      expiresIn: process.env.JWT_EXPIRES_IN || '15m',
+      expiresIn: '15m',
     });
 
     const refreshToken = this.jwtService.sign(payload, {
       secret: process.env.JWT_REFRESH_SECRET || 'echogpt_super_secret_jwt_refresh_key_2026',
-      expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
+      expiresIn: '7d',
     });
 
     return { accessToken, refreshToken };

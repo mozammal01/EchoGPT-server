@@ -30,7 +30,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Log in with email and password' })
   @ApiResponse({ status: 200, description: 'Authentication successful, returns JWT access and refresh tokens' })
   @ApiResponse({ status: 401, description: 'Invalid email or password' })
-  async login(@Body() dto: LoginDto, @Req() req: Request) {
+  async login(@Body() dto: LoginDto, @Req() req: any) {
     const userAgent = req.headers['user-agent'];
     const ipAddress = req.ip || req.socket.remoteAddress;
     return this.authService.login(dto, userAgent, ipAddress);

@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: echogpt_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: echogpt
+      POSTGRES_PASSWORD: echogpt_pass
+      POSTGRES_DB: echogpt_db
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U echogpt -d echogpt_db']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: echogpt_server
+    restart: always
+    ports:
+      - '3000:3000'
+    environment:
+      PORT: 3000
+      NODE_ENV: production
+      API_PREFIX: api/v1
+      DATABASE_URL: postgresql://echogpt:echogpt_pass@postgres:5432/echogpt_db?schema=public
+      JWT_SECRET: echogpt_super_secret_jwt_access_key_2026
+      JWT_EXPIRES_IN: 15m
+      JWT_REFRESH_SECRET: echogpt_super_secret_jwt_refresh_key_2026
+      JWT_REFRESH_EXPIRES_IN: 7d
+      ENCRYPTION_KEY: echogpt_aes_256_secret_key_32c!
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:

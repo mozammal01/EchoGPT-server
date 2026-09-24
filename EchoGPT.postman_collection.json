@@ -1,0 +1,390 @@
+{
+	"info": {
+		"_postman_id": "echogpt-postman-collection-2026",
+		"name": "EchoGPT Server API Collection",
+		"description": "Postman Collection for EchoGPT Backend REST API with Authentication, Subscription, AI Providers, Chat, Web Search, and Admin endpoints.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Authentication",
+			"item": [
+				{
+					"name": "Register User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"user@echogpt.io\",\n  \"password\": \"User@123456\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/register",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "register"]
+						}
+					}
+				},
+				{
+					"name": "Login User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"user@echogpt.io\",\n  \"password\": \"User@123456\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "Refresh Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/refresh",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "refresh"]
+						}
+					}
+				},
+				{
+					"name": "Get Current User (Me)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{accessToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/auth/me",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "me"]
+						}
+					}
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{accessToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/auth/logout",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "logout"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "2. User Management",
+			"item": [
+				{
+					"name": "Get User Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{accessToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/users/profile",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", "profile"]
+						}
+					}
+				},
+				{
+					"name": "Update Profile",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{accessToken}}" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Doe\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/profile",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", "profile"]
+						}
+					}
+				},
+				{
+					"name": "Change Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{accessToken}}" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"currentPassword\": \"User@123456\",\n  \"newPassword\": \"NewPassword@123456\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/change-password",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", "change-password"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "3. Subscription Management",
+			"item": [
+				{
+					"name": "Get Subscription Plans",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/subscriptions/plans",
+							"host": ["{{baseUrl}}"],
+							"path": ["subscriptions", "plans"]
+						}
+					}
+				},
+				{
+					"name": "Get Subscription Status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{accessToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/subscriptions/status",
+							"host": ["{{baseUrl}}"],
+							"path": ["subscriptions", "status"]
+						}
+					}
+				},
+				{
+					"name": "Upgrade Subscription",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{accessToken}}" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"plan\": \"PREMIUM\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/subscriptions/upgrade",
+							"host": ["{{baseUrl}}"],
+							"path": ["subscriptions", "upgrade"]
+						}
+					}
+				},
+				{
+					"name": "Get Remaining Requests",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{accessToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/subscriptions/remaining-requests",
+							"host": ["{{baseUrl}}"],
+							"path": ["subscriptions", "remaining-requests"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "4. AI Provider Management",
+			"item": [
+				{
+					"name": "Get Active Public Providers",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/ai-providers/public",
+							"host": ["{{baseUrl}}"],
+							"path": ["ai-providers", "public"]
+						}
+					}
+				},
+				{
+					"name": "Provider Health Check",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{adminAccessToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/ai-providers/health-check",
+							"host": ["{{baseUrl}}"],
+							"path": ["ai-providers", "health-check"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "5. Chat API",
+			"item": [
+				{
+					"name": "Send Prompt",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{accessToken}}" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"prompt\": \"Explain Quantum Computing in simple terms.\",\n  \"model\": \"gpt-4o\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/chat/completions",
+							"host": ["{{baseUrl}}"],
+							"path": ["chat", "completions"]
+						}
+					}
+				},
+				{
+					"name": "Get User Conversations",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{accessToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/chat/conversations",
+							"host": ["{{baseUrl}}"],
+							"path": ["chat", "conversations"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "6. Web Search API",
+			"item": [
+				{
+					"name": "Search Query",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{accessToken}}" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"NestJS Prisma best practices 2026\",\n  \"limit\": 5\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/web-search",
+							"host": ["{{baseUrl}}"],
+							"path": ["web-search"]
+						}
+					}
+				},
+				{
+					"name": "Get Search History",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{accessToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/web-search/history",
+							"host": ["{{baseUrl}}"],
+							"path": ["web-search", "history"]
+						}
+					}
+				},
+				{
+					"name": "Search Suggestions",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/web-search/suggestions?q=NestJS",
+							"host": ["{{baseUrl}}"],
+							"path": ["web-search", "suggestions"],
+							"query": [{ "key": "q", "value": "NestJS" }]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "7. Admin Panel APIs",
+			"item": [
+				{
+					"name": "Admin Dashboard Stats",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{adminAccessToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/admin/dashboard",
+							"host": ["{{baseUrl}}"],
+							"path": ["admin", "dashboard"]
+						}
+					}
+				},
+				{
+					"name": "Admin System Health",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{adminAccessToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/admin/system-health",
+							"host": ["{{baseUrl}}"],
+							"path": ["admin", "system-health"]
+						}
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000/api/v1",
+			"type": "string"
+		},
+		{
+			"key": "accessToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "adminAccessToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "refreshToken",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
